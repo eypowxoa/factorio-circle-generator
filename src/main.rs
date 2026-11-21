@@ -15,6 +15,7 @@ fn main() {
     let fraction = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
     let precision = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
     let step = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
+    let entity = args.next().unwrap_or(String::from("heat-pipe"));
     let mut previous_x = N::MIN;
     let mut previous_y = N::MIN;
     let mut blueprints: Vec<Value> = Vec::new();
@@ -65,6 +66,11 @@ fn main() {
             let s3 = format!("signal-{}", radius % 10);
             blueprints.push(json!({
                 "blueprint": {
+                    "snap-to-grid": {
+                        "x": 1,
+                        "y": 1
+                    },
+                    "absolute-snapping": true,
                     "icons": [
                         {
                             "signal": {
@@ -100,7 +106,7 @@ fn main() {
                         .enumerate()
                         .map(|(i, (x, y))| json!({
                             "entity_number": i + 1,
-                            "name": "heat-pipe",
+                            "name": entity,
                             "position": {
                                 "x": (*x as f64) + 0.5,
                                 "y": (*y as f64) + 0.5,
