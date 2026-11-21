@@ -114,7 +114,7 @@ fn main() {
                         }))
                         .collect::<Vec<Value>>(),
                     "item": "blueprint",
-                    "label": format!("[virtual-signal=shape-circle] {radius}"),
+                    "label": format!("[virtual-signal=shape-circle] {}", radius + 1),
                     "version": 562954249961473u64,
                 },
                 "index": blueprints.len(),
