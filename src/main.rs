@@ -9,12 +9,12 @@ type N = i64;
 fn main() {
     let mut args = args();
     args.next().unwrap();
-    let mode = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
-    let min = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
-    let max = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
-    let fraction = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
-    let precision = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
-    let step = N::from_str_radix(args.next().unwrap().as_str(), 10).unwrap();
+    let mode = N::from_str_radix(args.next().unwrap_or(String::from("4")).as_str(), 10).unwrap();
+    let min = N::from_str_radix(args.next().unwrap_or(String::from("5")).as_str(), 10).unwrap();
+    let max = N::from_str_radix(args.next().unwrap_or(String::from("50")).as_str(), 10).unwrap();
+    let fraction = N::from_str_radix(args.next().unwrap_or(String::from("7")).as_str(), 10).unwrap();
+    let precision = N::from_str_radix(args.next().unwrap_or(String::from("22")).as_str(), 10).unwrap();
+    let step = N::from_str_radix(args.next().unwrap_or(String::from("1")).as_str(), 10).unwrap();
     let entity = args.next().unwrap_or(String::from("heat-pipe"));
     let mut previous_x = N::MIN;
     let mut previous_y = N::MIN;
