@@ -15,7 +15,7 @@ fn main() {
     let fraction = N::from_str_radix(args.next().unwrap_or(String::from("7")).as_str(), 10).unwrap();
     let precision = N::from_str_radix(args.next().unwrap_or(String::from("22")).as_str(), 10).unwrap();
     let step = N::from_str_radix(args.next().unwrap_or(String::from("1")).as_str(), 10).unwrap();
-    let entity = args.next().unwrap_or(String::from("heat-pipe"));
+    let entity = args.next().unwrap_or(String::from("stone-wall"));
     let mut previous_x = N::MIN;
     let mut previous_y = N::MIN;
     let mut blueprints: Vec<Value> = Vec::new();
