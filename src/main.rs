@@ -1,4 +1,4 @@
-use std::{env::args, ops::Div};
+use std::{env::args};
 
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use serde_json::{Value, json, to_string_pretty};
@@ -56,11 +56,11 @@ fn main() {
             let radius = radius / precision;
             let s1 = match radius < 100 {
                 true => format!("shape-curve-2"),
-                false => format!("signal-{}", radius.div(100)),
+                false => format!("signal-{}", radius / 100),
             };
             let s2 = match radius < 10 {
                 true => format!("shape-curve-3"),
-                false => format!("signal-{}", radius.div(10)),
+                false => format!("signal-{}", radius / 10),
             };
             let s3 = format!("signal-{}", radius % 10);
             blueprints.push(json!({
