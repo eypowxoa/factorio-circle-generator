@@ -27,18 +27,17 @@ fn main() {
             };
             let radius = ((radius - 1) * precision) + substep + 1;
             let mut points: Vec<(N, N)> = Vec::new();
-            let mut x: N = radius;
-            let mut y: N = 0;
+            let mut at: (N, N) = (radius, 0);
             let mut previous = (N::MIN, N::MIN);
-            while x >= 0 {
-                match (radius.pow(2) - (y + 1).pow(2)) <= x.pow(2) {
-                    true => x -= 1,
-                    false => y += 1,
+            while at.0 >= 0 {
+                match (radius.pow(2) - (at.1 + 1).pow(2)) <= at.0.pow(2) {
+                    true => at.0 -= 1,
+                    false => at.1 += 1,
                 };
                 if 0 == mode {
-                    println!("◶ {x} {y}");
+                    println!("◶ {at:?}");
                 };
-                let current = (x / precision, y / precision);
+                let current = (at.0 / precision, at.1 / precision);
                 if current != previous {
                     points.push((current.0, current.1));
                     points.push((-current.0 - 1, current.1));
