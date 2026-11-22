@@ -16,7 +16,7 @@ fn main() {
     let mode = next_arg(&mut args, 4);
     let min = next_arg(&mut args, 5);
     let max = next_arg(&mut args, 60);
-    let fraction = next_arg(&mut args, 7);
+    let fraction = next_arg(&mut args, 8);
     let precision = next_arg(&mut args, 22);
     let step = next_arg(&mut args, 1);
     let entity = args.next().unwrap_or(String::from("stone-wall"));
@@ -25,11 +25,11 @@ fn main() {
         if (step > 1) && (radius < max) && (((radius - min) % step) != 0) {
             continue;
         };
-        for substep in 0..precision {
+        for substep in 1..=precision {
             if fraction > 0 && substep != fraction {
                 continue;
             };
-            let radius = ((radius - 1) * precision) + substep + 1;
+            let radius = ((radius - 1) * precision) + substep;
             let mut points: Vec<(N, N)> = Vec::new();
             let mut at: (N, N) = (radius, 0);
             let mut previous = (N::MIN, N::MIN);
