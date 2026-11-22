@@ -1,4 +1,4 @@
-use std::{env::args};
+use std::env::{Args, args};
 
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use serde_json::{Value, json, to_string_pretty};
@@ -6,15 +6,19 @@ use zlib_rs::{DeflateConfig, ReturnCode, compress_bound, compress_slice};
 
 type N = i64;
 
+fn next_arg(ags: &mut Args, def: N) -> N {
+    N::from_str_radix(ags.next().unwrap_or(def.to_string()).as_str(), 10).unwrap()
+}
+
 fn main() {
     let mut args = args();
     args.next().unwrap();
-    let mode = N::from_str_radix(args.next().unwrap_or(String::from("4")).as_str(), 10).unwrap();
-    let min = N::from_str_radix(args.next().unwrap_or(String::from("5")).as_str(), 10).unwrap();
-    let max = N::from_str_radix(args.next().unwrap_or(String::from("60")).as_str(), 10).unwrap();
-    let fraction = N::from_str_radix(args.next().unwrap_or(String::from("7")).as_str(), 10).unwrap();
-    let precision = N::from_str_radix(args.next().unwrap_or(String::from("22")).as_str(), 10).unwrap();
-    let step = N::from_str_radix(args.next().unwrap_or(String::from("1")).as_str(), 10).unwrap();
+    let mode = next_arg(&mut args, 4);
+    let min = next_arg(&mut args, 5);
+    let max = next_arg(&mut args, 60);
+    let fraction = next_arg(&mut args, 7);
+    let precision = next_arg(&mut args, 22);
+    let step = next_arg(&mut args, 1);
     let entity = args.next().unwrap_or(String::from("stone-wall"));
     let mut blueprints: Vec<Value> = Vec::new();
     for radius in min..(max + 1) {
