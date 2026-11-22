@@ -48,25 +48,15 @@ fn main() {
                 if 0 == mode {
                     println!("◶ {at:?}");
                 };
-                previous = if is_odd {
-                    let current = ((at.0 - 1) / (precision * 2), (at.1 - 1) / (precision * 2));
-                    if current != previous && is_odd {
-                        points.push((current.0, current.1));
-                        points.push((-current.0 - 2, current.1));
-                        points.push((-current.0 - 2, -current.1 - 2));
-                        points.push((current.0, -current.1 - 2));
-                    };
-                    current
-                } else {
-                    let current = (at.0 / (precision * 2), at.1 / (precision * 2));
-                    if current != previous {
-                        points.push((current.0, current.1));
-                        points.push((-current.0 - 1, current.1));
-                        points.push((-current.0 - 1, -current.1 - 1));
-                        points.push((current.0, -current.1 - 1));
-                    };
-                    current
+                let s = N::from(is_odd);
+                let current = ((at.0 - s) / (precision * 2), (at.1 - s) / (precision * 2));
+                if current != previous {
+                    points.push((current.0, current.1));
+                    points.push((-current.0 - 1 - s, current.1));
+                    points.push((-current.0 - 1 - s, -current.1 - 1 - s));
+                    points.push((current.0, -current.1 - 1 - s));
                 };
+                previous = current;
             }
             blueprints.push(json!({
                 "blueprint": {
