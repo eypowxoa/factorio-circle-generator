@@ -70,59 +70,25 @@ fn main() {
             }
             blueprints.push(json!({
                 "blueprint": {
-                    "snap-to-grid": {
-                        "x": 1,
-                        "y": 1
-                    },
+                    "snap-to-grid": {"x": 1, "y": 1},
                     "absolute-snapping": true,
                     "icons": [
-                        {
-                            "signal": {
-                                "type": "virtual",
-                                "name": "shape-curve",
-                            },
-                            "index": 1,
-                        },
-                        {
-                            "signal": {
-                                "type": "virtual",
-                                "name": match diameter < 100 {
-                                    true => format!("shape-curve-2"),
-                                    false => format!("signal-{}", diameter / 100),
-                                },
-                            },
-                            "index": 2,
-                        },
-                        {
-                            "signal": {
-                                "type": "virtual",
-                                "name": match diameter < 10 {
-                                    true => format!("shape-curve-3"),
-                                    false => format!("signal-{}", diameter / 10),
-                                },
-                            },
-                            "index": 3,
-                        },
-                        {
-                            "signal": {
-                                "type": "virtual",
-                                "name": format!("signal-{}", diameter % 10),
-                            },
-                            "index": 4,
-                        },
+                        {"signal": {"type": "virtual", "name": "shape-curve"}, "index": 1},
+                        {"signal": {"type": "virtual", "name": match diameter < 100 {
+                            true => format!("shape-curve-2"),
+                            false => format!("signal-{}", diameter / 100),
+                        }}, "index": 2},
+                        {"signal": {"type": "virtual", "name": match diameter < 10 {
+                            true => format!("shape-curve-3"),
+                            false => format!("signal-{}", diameter / 10),
+                        }}, "index": 3},
+                        {"signal": {"type": "virtual", "name": format!("signal-{}", diameter % 10)}, "index": 4},
                     ],
-                    "entities": points
-                        .iter()
-                        .enumerate()
-                        .map(|(i, (x, y))| json!({
-                            "entity_number": i + 1,
-                            "name": entity,
-                            "position": {
-                                "x": (*x as f64) + 0.5,
-                                "y": (*y as f64) + 0.5,
-                            },
-                        }))
-                        .collect::<Vec<Value>>(),
+                    "entities": points.iter().enumerate().map(|(i, (x, y))| json!({
+                        "entity_number": i + 1,
+                        "name": entity,
+                        "position": {"x": (*x as f64) + 0.5, "y": (*y as f64) + 0.5},
+                    })).collect::<Vec<Value>>(),
                     "item": "blueprint",
                     "label": format!("[virtual-signal=shape-circle] {}", diameter),
                     "version": 562954249961473u64,
@@ -136,15 +102,7 @@ fn main() {
             "blueprints": blueprints,
             "item": "blueprint-book",
             "label": "[virtual-signal=shape-circle]",
-            "icons": [
-                {
-                    "signal": {
-                        "type": "virtual",
-                        "name": "shape-circle",
-                    },
-                    "index": 1,
-                },
-            ],
+            "icons": [{"signal": {"type": "virtual", "name": "shape-circle"}, "index": 1}],
             "active_index": 0,
             "version": 562954249961473u64,
         },
