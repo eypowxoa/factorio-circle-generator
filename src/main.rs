@@ -22,17 +22,24 @@ fn main() {
     let entity = args.next().unwrap_or(String::from("stone-wall"));
     let mut blueprints: Vec<Value> = Vec::new();
     for diameter in min..(max + 1) {
-        if (step > 1) && (diameter < max) && (((diameter - min) % step) != 0) || diameter % 2 != 0 {
+        let is_odd = diameter % 2 != 0;
+        if (step > 1) && (diameter < max) && (((diameter - min) % step) != 0) {
             continue;
         };
         for substep in 1..=precision {
             if fraction > 0 && substep != fraction {
                 continue;
             };
-            let radius = ((diameter / 2 - 1) * precision) + substep;
+            let radius = (((diameter / 2 - 1) * precision) + substep) * 2;
             let mut points: Vec<(N, N)> = Vec::new();
             let mut at: (N, N) = (radius, 0);
             let mut previous = (N::MIN, N::MIN);
+            if is_odd {
+                points.push((diameter / 2 - 1, -1));
+                points.push((-diameter / 2 - 1, -1));
+                points.push((-1, diameter / 2 - 1));
+                points.push((-1, -diameter / 2 - 1));
+            };
             while at.0 >= 0 {
                 match (radius.pow(2) - (at.1 + 1).pow(2)) <= at.0.pow(2) {
                     true => at.0 -= 1,
@@ -41,14 +48,25 @@ fn main() {
                 if 0 == mode {
                     println!("◶ {at:?}");
                 };
-                let current = (at.0 / precision, at.1 / precision);
-                if current != previous {
-                    points.push((current.0, current.1));
-                    points.push((-current.0 - 1, current.1));
-                    points.push((-current.0 - 1, -current.1 - 1));
-                    points.push((current.0, -current.1 - 1));
+                previous = if is_odd {
+                    let current = ((at.0 - 1) / (precision * 2), (at.1 - 1) / (precision * 2));
+                    if current != previous && is_odd {
+                        points.push((current.0, current.1));
+                        points.push((-current.0 - 2, current.1));
+                        points.push((-current.0 - 2, -current.1 - 2));
+                        points.push((current.0, -current.1 - 2));
+                    };
+                    current
+                } else {
+                    let current = (at.0 / (precision * 2), at.1 / (precision * 2));
+                    if current != previous {
+                        points.push((current.0, current.1));
+                        points.push((-current.0 - 1, current.1));
+                        points.push((-current.0 - 1, -current.1 - 1));
+                        points.push((current.0, -current.1 - 1));
+                    };
+                    current
                 };
-                previous = current;
             }
             let s1 = match diameter < 100 {
                 true => format!("shape-curve-2"),
