@@ -14,22 +14,22 @@ fn main() {
     let mut args = args();
     args.next().unwrap();
     let mode = next_arg(&mut args, 4);
-    let min = next_arg(&mut args, 5);
-    let max = next_arg(&mut args, 60);
+    let min = next_arg(&mut args, 10);
+    let max = next_arg(&mut args, 120);
     let fraction = next_arg(&mut args, 8);
     let precision = next_arg(&mut args, 22);
     let step = next_arg(&mut args, 1);
     let entity = args.next().unwrap_or(String::from("stone-wall"));
     let mut blueprints: Vec<Value> = Vec::new();
-    for radius in min..(max + 1) {
-        if (step > 1) && (radius < max) && (((radius - min) % step) != 0) {
+    for diameter in min..(max + 1) {
+        if (step > 1) && (diameter < max) && (((diameter - min) % step) != 0) || diameter % 2 != 0 {
             continue;
         };
         for substep in 1..=precision {
             if fraction > 0 && substep != fraction {
                 continue;
             };
-            let radius = ((radius - 1) * precision) + substep;
+            let radius = ((diameter / 2 - 1) * precision) + substep;
             let mut points: Vec<(N, N)> = Vec::new();
             let mut at: (N, N) = (radius, 0);
             let mut previous = (N::MIN, N::MIN);
@@ -50,16 +50,15 @@ fn main() {
                 };
                 previous = current;
             }
-            let radius = radius / precision;
-            let s1 = match radius < 100 {
+            let s1 = match diameter < 100 {
                 true => format!("shape-curve-2"),
-                false => format!("signal-{}", radius / 100),
+                false => format!("signal-{}", diameter / 100),
             };
-            let s2 = match radius < 10 {
+            let s2 = match diameter < 10 {
                 true => format!("shape-curve-3"),
-                false => format!("signal-{}", radius / 10),
+                false => format!("signal-{}", diameter / 10),
             };
-            let s3 = format!("signal-{}", radius % 10);
+            let s3 = format!("signal-{}", diameter % 10);
             blueprints.push(json!({
                 "blueprint": {
                     "snap-to-grid": {
@@ -110,7 +109,7 @@ fn main() {
                         }))
                         .collect::<Vec<Value>>(),
                     "item": "blueprint",
-                    "label": format!("[virtual-signal=shape-circle] {}", radius + 1),
+                    "label": format!("[virtual-signal=shape-circle] {}", diameter),
                     "version": 562954249961473u64,
                 },
                 "index": blueprints.len(),
