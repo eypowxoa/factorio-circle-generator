@@ -12,8 +12,26 @@ fn next_arg(ags: &mut Args, def: N) -> N {
 
 fn main() {
     let mut args = args();
-    args.next().unwrap();
-    let mode = next_arg(&mut args, 14);
+    let program = args.next().unwrap();
+    let mode = next_arg(&mut args, 0);
+    if 0 == mode {
+        eprintln!("{}", format!(
+"Prints a blueprint book with circle blueprints.
+Usage: {program} mode [min=10] [max=120] [fraction=8] [precision=22] [step=1] [entity=stome-wall]
+mode - 0 help, 10 debug points, 11 pretty json, 12 json, 13 base64, 14 blueprint, 2* same but only quarter of circle
+min - minimal diameter
+max - maximal diameter
+fraction - subpixel circle position or 0 to generate all subpixel blueprints
+precision - subpixel resolution
+step - skip diameters between steps
+entity - stone-wall, land-mine
+Examples:
+{program} 14
+{program} 24 110 122 8 22 3 land-mine
+",
+        ));
+        return;
+    };
     let min = next_arg(&mut args, 10);
     let max = next_arg(&mut args, 120);
     let fraction = next_arg(&mut args, 8);
