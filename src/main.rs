@@ -16,8 +16,6 @@ fn main() {
     let precision = N::from_str_radix(args.next().unwrap_or(String::from("22")).as_str(), 10).unwrap();
     let step = N::from_str_radix(args.next().unwrap_or(String::from("1")).as_str(), 10).unwrap();
     let entity = args.next().unwrap_or(String::from("stone-wall"));
-    let mut previous_x = N::MIN;
-    let mut previous_y = N::MIN;
     let mut blueprints: Vec<Value> = Vec::new();
     for radius in min..(max + 1) {
         if (step > 1) && (radius < max) && (((radius - min) % step) != 0) {
@@ -31,6 +29,7 @@ fn main() {
             let mut points: Vec<(N, N)> = Vec::new();
             let mut x: N = radius;
             let mut y: N = 0;
+            let mut previous = (N::MIN, N::MIN);
             while x >= 0 {
                 match (radius.pow(2) - (y + 1).pow(2)) <= x.pow(2) {
                     true => x -= 1,
@@ -39,20 +38,14 @@ fn main() {
                 if 0 == mode {
                     println!("◶ {x} {y}");
                 };
-                let current_x = x / precision;
-                let current_y = y / precision;
-                if current_x != previous_x || current_y != previous_y {
-                    for a in [
-                        (1, 0, 1, 0),
-                        (-1, -1, 1, 0),
-                        (-1, -1, -1, -1),
-                        (1, 0, -1, -1),
-                    ] {
-                        points.push((current_x * a.0 + a.1, current_y * a.2 + a.3));
-                    }
+                let current = (x / precision, y / precision);
+                if current != previous {
+                    points.push((current.0, current.1));
+                    points.push((-current.0 - 1, current.1));
+                    points.push((-current.0 - 1, -current.1 - 1));
+                    points.push((current.0, -current.1 - 1));
                 };
-                previous_x = current_x;
-                previous_y = current_y;
+                previous = current;
             }
             let radius = radius / precision;
             let s1 = match radius < 100 {
