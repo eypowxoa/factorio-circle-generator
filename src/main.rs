@@ -128,4 +128,5 @@ fn main() {
         println!("0{b64}");
         return;
     };
+    panic!("Unknown mode.");
 }
