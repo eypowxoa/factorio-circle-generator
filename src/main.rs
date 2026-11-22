@@ -68,15 +68,6 @@ fn main() {
                     current
                 };
             }
-            let s1 = match diameter < 100 {
-                true => format!("shape-curve-2"),
-                false => format!("signal-{}", diameter / 100),
-            };
-            let s2 = match diameter < 10 {
-                true => format!("shape-curve-3"),
-                false => format!("signal-{}", diameter / 10),
-            };
-            let s3 = format!("signal-{}", diameter % 10);
             blueprints.push(json!({
                 "blueprint": {
                     "snap-to-grid": {
@@ -95,21 +86,27 @@ fn main() {
                         {
                             "signal": {
                                 "type": "virtual",
-                                "name": s1,
+                                "name": match diameter < 100 {
+                                    true => format!("shape-curve-2"),
+                                    false => format!("signal-{}", diameter / 100),
+                                },
                             },
                             "index": 2,
                         },
                         {
                             "signal": {
                                 "type": "virtual",
-                                "name": s2,
+                                "name": match diameter < 10 {
+                                    true => format!("shape-curve-3"),
+                                    false => format!("signal-{}", diameter / 10),
+                                },
                             },
                             "index": 3,
                         },
                         {
                             "signal": {
                                 "type": "virtual",
-                                "name": s3,
+                                "name": format!("signal-{}", diameter % 10),
                             },
                             "index": 4,
                         },
