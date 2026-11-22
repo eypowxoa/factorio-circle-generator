@@ -13,7 +13,7 @@ fn next_arg(ags: &mut Args, def: N) -> N {
 fn main() {
     let mut args = args();
     args.next().unwrap();
-    let mode = next_arg(&mut args, 4);
+    let mode = next_arg(&mut args, 14);
     let min = next_arg(&mut args, 10);
     let max = next_arg(&mut args, 120);
     let fraction = next_arg(&mut args, 8);
@@ -36,25 +36,29 @@ fn main() {
             let mut previous = (N::MIN, N::MIN);
             if is_odd {
                 points.push((diameter / 2 - 1, -1));
-                points.push((-diameter / 2 - 1, -1));
-                points.push((-1, diameter / 2 - 1));
-                points.push((-1, -diameter / 2 - 1));
+                if mode < 20 {
+                    points.push((-diameter / 2 - 1, -1));
+                    points.push((-1, diameter / 2 - 1));
+                    points.push((-1, -diameter / 2 - 1));
+                };
             };
             while at.0 >= 0 {
                 match (radius.pow(2) - (at.1 + 1).pow(2)) <= at.0.pow(2) {
                     true => at.0 -= 1,
                     false => at.1 += 1,
                 };
-                if 0 == mode {
+                if 10 == mode || 20 == mode {
                     println!("◶ {at:?}");
                 };
                 let s = N::from(is_odd);
                 let current = ((at.0 - s) / (precision * 2), (at.1 - s) / (precision * 2));
                 if current != previous {
                     points.push((current.0, current.1));
-                    points.push((-current.0 - 1 - s, current.1));
-                    points.push((-current.0 - 1 - s, -current.1 - 1 - s));
-                    points.push((current.0, -current.1 - 1 - s));
+                    if mode < 20 {
+                        points.push((-current.0 - 1 - s, current.1));
+                        points.push((-current.0 - 1 - s, -current.1 - 1 - s));
+                        points.push((current.0, -current.1 - 1 - s));
+                    };
                 };
                 previous = current;
             }
@@ -97,14 +101,14 @@ fn main() {
             "version": 562954249961473u64,
         },
     });
-    if 0 == mode {
+    if 10 == mode || 20 == mode {
         return;
     };
-    if 1 == mode {
+    if 11 == mode || 21 == mode {
         println!("{}", to_string_pretty(&json).unwrap());
         return;
     };
-    if 2 == mode {
+    if 12 == mode || 22 == mode {
         println!("{json}");
         return;
     };
@@ -120,11 +124,11 @@ fn main() {
         panic!("Can not compress.");
     }
     let b64 = STANDARD.encode(compressed);
-    if 3 == mode {
+    if 13 == mode || 23 == mode {
         println!("{b64}");
         return;
     };
-    if 4 == mode {
+    if 14 == mode || 24 == mode {
         println!("0{b64}");
         return;
     };
