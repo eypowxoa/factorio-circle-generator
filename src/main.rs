@@ -10,35 +10,8 @@ fn next_arg(ags: &mut Args, def: N) -> N {
     N::from_str_radix(ags.next().unwrap_or(def.to_string()).as_str(), 10).unwrap()
 }
 
-fn main() {
-    let mut args = args();
-    let program = args.next().unwrap();
-    let mode = next_arg(&mut args, 0);
-    if 0 == mode {
-        eprintln!("{}", format!(
-"Prints a blueprint book with circle blueprints.
-Usage: {program} mode [min=10] [max=120] [fraction=8] [precision=22] [step=1] [entity=stome-wall]
-mode - 0 help, 10 debug points, 11 pretty json, 12 json, 13 base64, 14 blueprint, 2* same but only quarter of circle
-min - minimal diameter
-max - maximal diameter
-fraction - subpixel circle position or 0 to generate all subpixel blueprints
-precision - subpixel resolution
-step - skip diameters between steps
-entity - stone-wall, land-mine
-Examples:
-{program} 14
-{program} 24 110 122 8 22 3 land-mine
-",
-        ));
-        return;
-    };
-    let min = next_arg(&mut args, 10);
-    let max = next_arg(&mut args, 120);
-    let fraction = next_arg(&mut args, 8);
-    let precision = next_arg(&mut args, 22);
-    let step = next_arg(&mut args, 1);
-    let entity = args.next().unwrap_or(String::from("stone-wall"));
-    let mut blueprints: Vec<Value> = Vec::new();
+fn generate(mode: N, min: N, max: N, fraction: N, precision: N, step: N) -> Vec<(N, Vec<(N, N)>)> {
+    let mut circles = Vec::new();
     for diameter in min..(max + 1) {
         let is_odd = diameter % 2 != 0;
         if (step > 1) && (diameter < max) && (((diameter - min) % step) != 0) {
@@ -80,34 +53,70 @@ Examples:
                 };
                 previous = current;
             }
-            blueprints.push(json!({
-                "blueprint": {
-                    "snap-to-grid": {"x": 1, "y": 1},
-                    "absolute-snapping": true,
-                    "icons": [
-                        {"signal": {"type": "virtual", "name": "shape-curve"}, "index": 1},
-                        {"signal": {"type": "virtual", "name": match diameter < 100 {
-                            true => format!("shape-curve-2"),
-                            false => format!("signal-{}", diameter / 100),
-                        }}, "index": 2},
-                        {"signal": {"type": "virtual", "name": match diameter < 10 {
-                            true => format!("shape-curve-3"),
-                            false => format!("signal-{}", diameter / 10),
-                        }}, "index": 3},
-                        {"signal": {"type": "virtual", "name": format!("signal-{}", diameter % 10)}, "index": 4},
-                    ],
-                    "entities": points.iter().enumerate().map(|(i, (x, y))| json!({
-                        "entity_number": i + 1,
-                        "name": entity,
-                        "position": {"x": (*x as f64) + 0.5, "y": (*y as f64) + 0.5},
-                    })).collect::<Vec<Value>>(),
-                    "item": "blueprint",
-                    "label": format!("[virtual-signal=shape-circle] {}", diameter),
-                    "version": 562954249961473u64,
-                },
-                "index": blueprints.len(),
-            }));
+            circles.push((diameter, points));
         }
+    }
+    circles
+}
+
+fn main() {
+    let mut args = args();
+    let program = args.next().unwrap();
+    let mode = next_arg(&mut args, 0);
+    if 0 == mode {
+        eprintln!("{}", format!(
+"Prints a blueprint book with circle blueprints.
+Usage: {program} mode [min=10] [max=120] [fraction=8] [precision=22] [step=1] [entity=stome-wall]
+mode - 0 help, 10 debug points, 11 pretty json, 12 json, 13 base64, 14 blueprint, 2* same but only quarter of circle
+min - minimal diameter
+max - maximal diameter
+fraction - subpixel circle position or 0 to generate all subpixel blueprints
+precision - subpixel resolution
+step - skip diameters between steps
+entity - stone-wall, land-mine
+Examples:
+{program} 14
+{program} 24 110 122 8 22 3 land-mine
+",
+        ));
+        return;
+    };
+    let min = next_arg(&mut args, 10);
+    let max = next_arg(&mut args, 120);
+    let fraction = next_arg(&mut args, 8);
+    let precision = next_arg(&mut args, 22);
+    let step = next_arg(&mut args, 1);
+    let entity = args.next().unwrap_or(String::from("stone-wall"));
+    let circles = generate(mode, min, max, fraction, precision, step);
+    let mut blueprints: Vec<Value> = Vec::new();
+    for (diameter, points) in circles {
+        blueprints.push(json!({
+            "blueprint": {
+                "snap-to-grid": {"x": 1, "y": 1},
+                "absolute-snapping": true,
+                "icons": [
+                    {"signal": {"type": "virtual", "name": "shape-curve"}, "index": 1},
+                    {"signal": {"type": "virtual", "name": match diameter < 100 {
+                        true => format!("shape-curve-2"),
+                        false => format!("signal-{}", diameter / 100),
+                    }}, "index": 2},
+                    {"signal": {"type": "virtual", "name": match diameter < 10 {
+                        true => format!("shape-curve-3"),
+                        false => format!("signal-{}", diameter / 10),
+                    }}, "index": 3},
+                    {"signal": {"type": "virtual", "name": format!("signal-{}", diameter % 10)}, "index": 4},
+                ],
+                "entities": points.iter().enumerate().map(|(i, (x, y))| json!({
+                    "entity_number": i + 1,
+                    "name": entity,
+                    "position": {"x": (*x as f64) + 0.5, "y": (*y as f64) + 0.5},
+                })).collect::<Vec<Value>>(),
+                "item": "blueprint",
+                "label": format!("[virtual-signal=shape-circle] {}", diameter),
+                "version": 562954249961473u64,
+            },
+            "index": blueprints.len(),
+        }));
     }
     let json = json!({
         "blueprint_book": {
