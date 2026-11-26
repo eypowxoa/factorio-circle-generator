@@ -36,8 +36,8 @@ factorio-circle-generator 14 > out.txt
 
 Most likely the output will not fit to the console, so you need to save it to a file.
 
-### Circle of mines with diameters 110, 113, 116, 119 and 122
+### Circle of mines with diameters 8, 11 and 14
 
 ```sh
-factorio-circle-generator 24 110 122 8 22 3 land-mine
+factorio-circle-generator 14 8 14 8 22 3 land-mine
 ```
