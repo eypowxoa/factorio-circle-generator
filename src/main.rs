@@ -65,17 +65,37 @@ fn main() {
     let mode = next_arg(&mut args, 0);
     if 0 == mode {
         eprintln!("{}", format!(
-"Prints a blueprint book with circle blueprints.
-Usage: {program} mode [min=10] [max=120] [fraction=8] [precision=22] [step=1] [entity=stome-wall]
-mode - 0 help, 10 debug points, 11 pretty json, 12 json, 13 base64, 14 blueprint, 2* same but only quarter of circle
-min - minimal diameter
-max - maximal diameter
-fraction - subpixel circle position or 0 to generate all subpixel blueprints
-precision - subpixel resolution
-step - skip diameters between steps
-entity - stone-wall, land-mine
+"Circle Blueprint Generator for Factorio.
+
+Prints a blueprint book with a circle blueprints. Copy the output and paste it into the game using the Factorio's string import function.
+
+Usage:
+{program} [mode=0] [min=10] [max=120] [fraction=8] [precision=22] [step=1] [entity=stome-wall]
+
+- mode - output format, 14 or maybe 24 is good.
+- min - minimal diameter, choose what you want.
+- max - maximal diameter, choose what you want.
+- fraction - subpixel circle position or 0 to generate all subpixel blueprints, 8 is good.
+- precision - subpixel resolution, 22 is good.
+- step - skip diameters between steps, 1 is good.
+- entity - stone-wall, land-mine or any other but not tile.
+
+Mode:
+- 0 - this text.
+- 10 - debug points.
+- 11 - pretty json.
+- 12 - json.
+- 13 - base64.
+- 14 - blueprint.
+- 2* - same but only quarter of circle.
+
 Examples:
-{program} 14
+
+Circle of walls with diameters from 10 to 120:
+{program} 14 > out.txt
+Most likely the output will not fit to the console, so you need to save it to a file.
+
+Circle of mines with diameters 110, 113, 116, 119 and 122:
 {program} 24 110 122 8 22 3 land-mine
 ",
         ));
