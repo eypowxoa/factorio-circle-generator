@@ -6,11 +6,28 @@ use zlib_rs::{DeflateConfig, ReturnCode, compress_bound, compress_slice};
 
 type N = i64;
 
+#[derive(Debug, Eq, PartialEq)]
+struct Point {
+    x: N,
+    y: N,
+}
+
+impl Point {
+    fn new(x: N, y: N) -> Self {
+        Self { x, y }
+    }
+}
+
+struct DiameterPoints {
+    diameter: N,
+    points: Vec<Point>,
+}
+
 fn next_arg(ags: &mut Args, def: N) -> N {
     N::from_str_radix(ags.next().unwrap_or(def.to_string()).as_str(), 10).unwrap()
 }
 
-fn generate(mode: N, min: N, max: N, fraction: N, precision: N, step: N) -> Vec<(N, Vec<(N, N)>)> {
+fn generate(mode: N, min: N, max: N, fraction: N, precision: N, step: N) -> Vec<DiameterPoints> {
     let mut circles = Vec::new();
     for diameter in min..(max + 1) {
         let is_odd = diameter % 2 != 0;
@@ -22,38 +39,39 @@ fn generate(mode: N, min: N, max: N, fraction: N, precision: N, step: N) -> Vec<
                 continue;
             };
             let radius = (((diameter / 2 - 1) * precision) + substep) * 2;
-            let mut points: Vec<(N, N)> = Vec::new();
-            let mut at: (N, N) = (radius, 0);
-            let mut previous = (N::MIN, N::MIN);
+            let mut points = Vec::new();
+            let mut at = Point::new(radius, 0);
+            let mut previous = Point::new(N::MIN, N::MIN);
             if is_odd {
-                points.push((diameter / 2 - 1, -1));
+                points.push(Point::new(diameter / 2 - 1, -1));
                 if mode < 20 {
-                    points.push((-diameter / 2 - 1, -1));
-                    points.push((-1, diameter / 2 - 1));
-                    points.push((-1, -diameter / 2 - 1));
+                    points.push(Point::new(-diameter / 2 - 1, -1));
+                    points.push(Point::new(-1, diameter / 2 - 1));
+                    points.push(Point::new(-1, -diameter / 2 - 1));
                 };
             };
-            while at.0 >= 0 {
-                match (radius.pow(2) - (at.1 + 1).pow(2)) <= at.0.pow(2) {
-                    true => at.0 -= 1,
-                    false => at.1 += 1,
+            while at.x >= 0 {
+                match (radius.pow(2) - (at.y + 1).pow(2)) <= at.x.pow(2) {
+                    true => at.x -= 1,
+                    false => at.y += 1,
                 };
                 if 10 == mode || 20 == mode {
                     println!("◶ {at:?}");
                 };
                 let s = N::from(is_odd);
-                let current = ((at.0 - s) / (precision * 2), (at.1 - s) / (precision * 2));
+                let current =
+                    Point::new((at.x - s) / (precision * 2), (at.y - s) / (precision * 2));
                 if current != previous {
-                    points.push((current.0, current.1));
+                    points.push(Point::new(current.x, current.y));
                     if mode < 20 {
-                        points.push((-current.0 - 1 - s, current.1));
-                        points.push((-current.0 - 1 - s, -current.1 - 1 - s));
-                        points.push((current.0, -current.1 - 1 - s));
+                        points.push(Point::new(-current.x - 1 - s, current.y));
+                        points.push(Point::new(-current.x - 1 - s, -current.y - 1 - s));
+                        points.push(Point::new(current.x, -current.y - 1 - s));
                     };
                 };
                 previous = current;
             }
-            circles.push((diameter, points));
+            circles.push(DiameterPoints { diameter, points });
         }
     }
     circles
@@ -109,7 +127,7 @@ Circle of mines with diameters 8, 11 and 14:
     let entity = args.next().unwrap_or(String::from("stone-wall"));
     let circles = generate(mode, min, max, fraction, precision, step);
     let mut blueprints: Vec<Value> = Vec::new();
-    for (diameter, points) in circles {
+    for DiameterPoints { diameter, points } in circles {
         blueprints.push(json!({
             "blueprint": {
                 "snap-to-grid": {"x": 1, "y": 1},
@@ -126,7 +144,7 @@ Circle of mines with diameters 8, 11 and 14:
                     }}, "index": 3},
                     {"signal": {"type": "virtual", "name": format!("signal-{}", diameter % 10)}, "index": 4},
                 ],
-                "entities": points.iter().enumerate().map(|(i, (x, y))| json!({
+                "entities": points.iter().enumerate().map(|(i, Point{ x, y })| json!({
                     "entity_number": i + 1,
                     "name": entity,
                     "position": {"x": (*x as f64) + 0.5, "y": (*y as f64) + 0.5},
