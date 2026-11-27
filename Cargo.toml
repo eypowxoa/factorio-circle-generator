@@ -3,7 +3,11 @@ name = "factorio-circle-generator"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 base64 = "0.23.1"
 serde_json = { version = "1.0.154", features = ["preserve_order"] }
+wasm-bindgen = "0.2.130"
 zlib-rs = "0.6.8"

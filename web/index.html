@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width, initial scale=1.0">
+    <title>Circle Blueprint Generator for Factorio</title>
+    <link href="index.css" rel="stylesheet">
+    <script src="index.js" type="module"></script>
+</head>
+<body class="app">
+    <div class="input">
+        <label for="quarter">Quarter:</label>
+        <input id="quarter" type="checkbox" value="on">
+        <button id="starter">Start</button>
+        <label for="min">Min:</label>
+        <input id="min" min="1" step="1" type="number" value="8">
+        <div class="comborange">
+            <input id="minRange1" max="100" min="1" step="1" type="range">
+            <input id="minRange100" max="9" min="0" step="1" type="range">
+        </div>
+        <label for="size">Size:</label>
+        <input id="size" min="1" step="1" type="number" value="1">
+        <input id="sizeRange" max="20" min="1" step="1" type="range">
+        <label for="fraction">Fraction:</label>
+        <input id="fraction" min="1" step="1" type="number" value="8">
+        <input id="fractionRange" max="100" min="1" step="1" type="range">
+        <label for="precision">Precision:</label>
+        <input id="precision" min="1" step="1" type="number" value="22">
+        <input id="precisionRange" max="100" min="1" step="1" type="range">
+        <label for="step">Step:</label>
+        <input id="step" min="1" step="1" type="number" value="1">
+        <input id="stepRange" max="20" min="1" step="1" type="range">
+    </div>
+    <div class="preview-box">
+        <canvas class="preview" height="100" id="preview" width="100"></canvas>
+    </div>
+    <textarea class="blueprint" id="blueprint" readonly></textarea>
+    <p class="hidden" id="note">Copied to clipboard!</p>
+</body>

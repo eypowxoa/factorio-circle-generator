@@ -1,8 +1,9 @@
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use serde_json::{Value, json, to_string_pretty};
+use wasm_bindgen::prelude::wasm_bindgen;
 use zlib_rs::{DeflateConfig, ReturnCode, compress_bound, compress_slice};
 
-pub type N = i64;
+pub type N = i32;
 
 #[derive(Eq, PartialEq)]
 pub struct Point {
@@ -150,4 +151,50 @@ pub fn blueprint(
         return format!("0{b64}");
     };
     panic!("Unknown mode.");
+}
+
+#[wasm_bindgen]
+pub fn generate_points(
+    quarter: bool,
+    min: N,
+    max: N,
+    fraction: N,
+    precision: N,
+    step: N,
+) -> Vec<N> {
+    let mut result = Vec::new();
+    for DiameterPoints { diameter, points } in
+        generate(quarter, min, max, fraction, precision, step)
+    {
+        result.push(diameter);
+        result.push(N::try_from(points.len()).unwrap());
+        for Point { x, y } in points {
+            result.push(x);
+            result.push(y);
+        }
+    }
+    result
+}
+
+#[wasm_bindgen]
+pub fn generate_blueprint(
+    quarter: bool,
+    min: N,
+    max: N,
+    fraction: N,
+    precision: N,
+    step: N,
+) -> String {
+    blueprint(
+        match quarter {
+            false => 14,
+            true => 24,
+        },
+        min,
+        max,
+        fraction,
+        precision,
+        step,
+        "stone-wall",
+    )
 }
