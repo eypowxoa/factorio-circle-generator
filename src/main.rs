@@ -56,7 +56,7 @@ Circle of mines with diameters 8, 11 and 14:
     let precision = next_arg(&mut args, 22);
     let step = next_arg(&mut args, 1);
     let entity = args.next().unwrap_or(String::from("stone-wall"));
-    let circles = generate(mode, min, max, fraction, precision, step);
+    let circles = generate(mode >= 20, min, max, fraction, precision, step);
     let mut blueprints: Vec<Value> = Vec::new();
     for DiameterPoints { diameter, points } in circles {
         blueprints.push(json!({

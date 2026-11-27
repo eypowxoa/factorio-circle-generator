@@ -18,7 +18,7 @@ pub struct DiameterPoints {
 }
 
 pub fn generate(
-    mode: N,
+    quarter: bool,
     min: N,
     max: N,
     fraction: N,
@@ -41,7 +41,7 @@ pub fn generate(
             let mut previous = Point::new(N::MIN, N::MIN);
             if is_odd {
                 points.push(Point::new(diameter / 2 - 1, -1));
-                if mode < 20 {
+                if !quarter {
                     points.push(Point::new(-diameter / 2 - 1, -1));
                     points.push(Point::new(-1, diameter / 2 - 1));
                     points.push(Point::new(-1, -diameter / 2 - 1));
@@ -57,7 +57,7 @@ pub fn generate(
                     Point::new((at.x - s) / (precision * 2), (at.y - s) / (precision * 2));
                 if current != previous {
                     points.push(Point::new(current.x, current.y));
-                    if mode < 20 {
+                    if !quarter {
                         points.push(Point::new(-current.x - 1 - s, current.y));
                         points.push(Point::new(-current.x - 1 - s, -current.y - 1 - s));
                         points.push(Point::new(current.x, -current.y - 1 - s));
