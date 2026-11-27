@@ -9,6 +9,75 @@ fn next_arg(ags: &mut Args, def: N) -> N {
     N::from_str_radix(ags.next().unwrap_or(def.to_string()).as_str(), 10).unwrap()
 }
 
+fn blueprint(mode: N, min: N, max: N, fraction: N, precision: N, step: N, entity: &str) -> String {
+    let circles = generate(mode >= 20, min, max, fraction, precision, step);
+    let mut blueprints: Vec<Value> = Vec::new();
+    for DiameterPoints { diameter, points } in circles {
+        blueprints.push(json!({
+            "blueprint": {
+                "snap-to-grid": {"x": 1, "y": 1},
+                "absolute-snapping": true,
+                "icons": [
+                    {"signal": {"type": "virtual", "name": "shape-curve"}, "index": 1},
+                    {"signal": {"type": "virtual", "name": match diameter < 100 {
+                        true => format!("shape-curve-2"),
+                        false => format!("signal-{}", diameter / 100),
+                    }}, "index": 2},
+                    {"signal": {"type": "virtual", "name": match diameter < 10 {
+                        true => format!("shape-curve-3"),
+                        false => format!("signal-{}", diameter / 10),
+                    }}, "index": 3},
+                    {"signal": {"type": "virtual", "name": format!("signal-{}", diameter % 10)}, "index": 4},
+                ],
+                "entities": points.iter().enumerate().map(|(i, Point{ x, y })| json!({
+                    "entity_number": i + 1,
+                    "name": entity,
+                    "position": {"x": (*x as f64) + 0.5, "y": (*y as f64) + 0.5},
+                })).collect::<Vec<Value>>(),
+                "item": "blueprint",
+                "label": format!("[virtual-signal=shape-circle] {}", diameter),
+                "version": 562954249961473u64,
+            },
+            "index": blueprints.len(),
+        }));
+    }
+    let json = json!({
+        "blueprint_book": {
+            "blueprints": blueprints,
+            "item": "blueprint-book",
+            "label": "[virtual-signal=shape-circle]",
+            "icons": [{"signal": {"type": "virtual", "name": "shape-circle"}, "index": 1}],
+            "active_index": 0,
+            "version": 562954249961473u64,
+        },
+    });
+    if 11 == mode || 21 == mode {
+        return format!("{}", to_string_pretty(&json).unwrap());
+    };
+    if 12 == mode || 22 == mode {
+        return format!("{json}");
+    };
+    let json = json.to_string();
+    let mut buffer = vec![0u8; compress_bound(json.len())];
+    let (compressed, rc) = compress_slice(
+        &mut buffer,
+        json.as_bytes(),
+        DeflateConfig::best_compression(),
+    );
+    if let ReturnCode::Ok = rc {
+    } else {
+        panic!("Can not compress.");
+    }
+    let b64 = STANDARD.encode(compressed);
+    if 13 == mode || 23 == mode {
+        return format!("{b64}");
+    };
+    if 14 == mode || 24 == mode {
+        return format!("0{b64}");
+    };
+    panic!("Unknown mode.");
+}
+
 fn main() {
     let mut args = args();
     let program = args.next().unwrap();
@@ -56,74 +125,8 @@ Circle of mines with diameters 8, 11 and 14:
     let precision = next_arg(&mut args, 22);
     let step = next_arg(&mut args, 1);
     let entity = args.next().unwrap_or(String::from("stone-wall"));
-    let circles = generate(mode >= 20, min, max, fraction, precision, step);
-    let mut blueprints: Vec<Value> = Vec::new();
-    for DiameterPoints { diameter, points } in circles {
-        blueprints.push(json!({
-            "blueprint": {
-                "snap-to-grid": {"x": 1, "y": 1},
-                "absolute-snapping": true,
-                "icons": [
-                    {"signal": {"type": "virtual", "name": "shape-curve"}, "index": 1},
-                    {"signal": {"type": "virtual", "name": match diameter < 100 {
-                        true => format!("shape-curve-2"),
-                        false => format!("signal-{}", diameter / 100),
-                    }}, "index": 2},
-                    {"signal": {"type": "virtual", "name": match diameter < 10 {
-                        true => format!("shape-curve-3"),
-                        false => format!("signal-{}", diameter / 10),
-                    }}, "index": 3},
-                    {"signal": {"type": "virtual", "name": format!("signal-{}", diameter % 10)}, "index": 4},
-                ],
-                "entities": points.iter().enumerate().map(|(i, Point{ x, y })| json!({
-                    "entity_number": i + 1,
-                    "name": entity,
-                    "position": {"x": (*x as f64) + 0.5, "y": (*y as f64) + 0.5},
-                })).collect::<Vec<Value>>(),
-                "item": "blueprint",
-                "label": format!("[virtual-signal=shape-circle] {}", diameter),
-                "version": 562954249961473u64,
-            },
-            "index": blueprints.len(),
-        }));
-    }
-    let json = json!({
-        "blueprint_book": {
-            "blueprints": blueprints,
-            "item": "blueprint-book",
-            "label": "[virtual-signal=shape-circle]",
-            "icons": [{"signal": {"type": "virtual", "name": "shape-circle"}, "index": 1}],
-            "active_index": 0,
-            "version": 562954249961473u64,
-        },
-    });
-    if 11 == mode || 21 == mode {
-        println!("{}", to_string_pretty(&json).unwrap());
-        return;
-    };
-    if 12 == mode || 22 == mode {
-        println!("{json}");
-        return;
-    };
-    let json = json.to_string();
-    let mut buffer = vec![0u8; compress_bound(json.len())];
-    let (compressed, rc) = compress_slice(
-        &mut buffer,
-        json.as_bytes(),
-        DeflateConfig::best_compression(),
-    );
-    if let ReturnCode::Ok = rc {
-    } else {
-        panic!("Can not compress.");
-    }
-    let b64 = STANDARD.encode(compressed);
-    if 13 == mode || 23 == mode {
-        println!("{b64}");
-        return;
-    };
-    if 14 == mode || 24 == mode {
-        println!("0{b64}");
-        return;
-    };
-    panic!("Unknown mode.");
+    println!(
+        "{}",
+        blueprint(mode, min, max, fraction, precision, step, &entity)
+    )
 }
