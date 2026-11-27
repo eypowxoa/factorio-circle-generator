@@ -6,7 +6,7 @@ use zlib_rs::{DeflateConfig, ReturnCode, compress_bound, compress_slice};
 
 type N = i64;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Eq, PartialEq)]
 struct Point {
     x: N,
     y: N,
@@ -55,9 +55,6 @@ fn generate(mode: N, min: N, max: N, fraction: N, precision: N, step: N) -> Vec<
                     true => at.x -= 1,
                     false => at.y += 1,
                 };
-                if 10 == mode || 20 == mode {
-                    println!("◶ {at:?}");
-                };
                 let s = N::from(is_odd);
                 let current =
                     Point::new((at.x - s) / (precision * 2), (at.y - s) / (precision * 2));
@@ -100,7 +97,6 @@ Usage:
 
 Mode:
 - 0 - this text.
-- 10 - debug points.
 - 11 - pretty json.
 - 12 - json.
 - 13 - base64.
@@ -166,9 +162,6 @@ Circle of mines with diameters 8, 11 and 14:
             "version": 562954249961473u64,
         },
     });
-    if 10 == mode || 20 == mode {
-        return;
-    };
     if 11 == mode || 21 == mode {
         println!("{}", to_string_pretty(&json).unwrap());
         return;

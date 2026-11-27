@@ -19,7 +19,6 @@ factorio-circle-generator [mode=0] [min=10] [max=120] [fraction=8] [precision=22
 
 ## Mode
 - `0` - this text.
-- `10` - debug points.
 - `11` - pretty json.
 - `12` - json.
 - `13` - base64.
